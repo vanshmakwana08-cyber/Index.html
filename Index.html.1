@@ -1,0 +1,108 @@
+import React, { useState, useEffect } from "react";
+
+function App() {
+  const [cartoons, setCartoons] = useState([]);
+  const [search, setSearch] = useState("");
+  const [form, setForm] = useState({
+    name: "",
+    category: "Comedy",
+    platform: "",
+    type: "Free"
+  });
+
+  useEffect(() => {
+    const saved = JSON.parse(localStorage.getItem("cartoons"));
+    if (saved) setCartoons(saved);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("cartoons", JSON.stringify(cartoons));
+  }, [cartoons]);
+
+  const addCartoon = () => {
+    if (!form.name || !form.platform) return alert("Fill all fields");
+
+    setCartoons([...cartoons, form]);
+    setForm({ name: "", category: "Comedy", platform: "", type: "Free" });
+  };
+
+  const deleteCartoon = (index) => {
+    const updated = cartoons.filter((_, i) => i !== index);
+    setCartoons(updated);
+  };
+
+  const filtered = cartoons.filter(c =>
+    c.name.toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <div style={{ padding: 20 }}>
+      <h2>🎬 Cartoon Manager (React)</h2>
+
+      <input
+        placeholder="Search..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
+
+      <input
+        placeholder="Cartoon Name"
+        value={form.name}
+        onChange={(e) => setForm({ ...form, name: e.target.value })}
+      />
+
+      <select
+        value={form.category}
+        onChange={(e) => setForm({ ...form, category: e.target.value })}
+      >
+        <option>Comedy</option>
+        <option>Adventure</option>
+        <option>Horror</option>
+        <option>Action</option>
+      </select>
+
+      <input
+        placeholder="Platform"
+        value={form.platform}
+        onChange={(e) => setForm({ ...form, platform: e.target.value })}
+      />
+
+      <select
+        value={form.type}
+        onChange={(e) => setForm({ ...form, type: e.target.value })}
+      >
+        <option>Free</option>
+        <option>Paid</option>
+      </select>
+
+      <button onClick={addCartoon}>Add</button>
+
+      <table border="1" cellPadding="5" style={{ marginTop: 20 }}>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Platform</th>
+            <th>Type</th>
+            <th>Delete</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filtered.map((c, i) => (
+            <tr key={i}>
+              <td>{c.name}</td>
+              <td>{c.category}</td>
+              <td>{c.platform}</td>
+              <td>{c.type}</td>
+              <td>
+                <button onClick={() => deleteCartoon(i)}>X</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+export default App;
